@@ -1,0 +1,279 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>RAG calculator</title>
+  <style>
+    body{
+      font-family:Arial, sans-serif;
+      background:#f3f6fb;
+      color:#222;
+      margin:0;
+      padding:24px;
+    }
+    .container{
+      max-width:900px;
+      margin:auto;
+      background:#fff;
+      padding:24px;
+      border-radius:10px;
+      box-shadow:0 4px 12px rgba(0,0,0,0.1);
+    }
+    h1{margin-top:0}
+    label{display:block;margin-top:12px;font-weight:bold}
+    input,select{
+      width:100%;
+      padding:8px;
+      margin-top:4px;
+      box-sizing:border-box;
+      border:1px solid #ccc;
+      border-radius:6px;
+    }
+    button{
+      margin-top:20px;
+      padding:10px 14px;
+      background:#007bff;
+      color:#fff;
+      border:none;
+      border-radius:6px;
+      cursor:pointer;
+      font-weight:bold;
+    }
+    button:hover{background:#0056b3;}
+    #result{
+      margin-top:20px;
+      padding:14px;
+      border-radius:10px;
+      background:#f8f9fb;
+      border:1px solid #e0e4ea;
+    }
+    .green{color:green; font-weight:bold;}
+    .amber{color:orange; font-weight:bold;}
+    .red{color:red; font-weight:bold;}
+    ul{margin-top:6px; padding-left:18px;}
+    li{margin-bottom:4px;}
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>RAG Calculator</h1>
+
+    <label>BMI</label>
+    <input type="number" id="bmi" placeholder="Enter BMI" step="0.1" min="0">
+
+    <label>Cardiac issues</label>
+    <select id="cardiac">
+      <option value="0">None</option>
+      <option value="1">No/minimal limitation</option>
+      <option value="3">Significant limitation</option>
+    </select>
+
+    <label>Respiratory issues</label>
+    <select id="respiratory">
+      <option value="0">None</option>
+      <option value="1">No/minimal limitation</option>
+      <option value="3">Significant limitation</option>
+    </select>
+
+    <label>Neurological issues</label>
+    <select id="neurological">
+      <option value="0">None</option>
+      <option value="1">No/minimal limitation</option>
+      <option value="3">Significant limitation</option>
+    </select>
+
+    <label>Psychiatric issues</label>
+    <select id="psychiatric">
+      <option value="0">None</option>
+      <option value="1">No/minimal limitation</option>
+      <option value="3">Significant limitation</option>
+    </select>
+
+    <label>Can they get out of the house on their own?</label>
+    <select id="getOut">
+      <option value="0">Yes</option>
+      <option value="1">No</option>
+    </select>
+
+    <label>Diabetes</label>
+    <select id="diabetes">
+      <option value="0">None</option>
+      <option value="0">Not on Insulin and HbA1c &lt; 69</option>
+      <option value="1">On Insulin or HbA1c &gt; 69</option>
+      <option value="3">HbA1c &gt; 100</option>
+    </select>
+
+    <label>Age &gt;80 for knee or &gt;85 for hip</label>
+    <select id="ageFlag">
+      <option value="0">No</option>
+      <option value="1">Yes</option>
+    </select>
+
+    <label>Recent hospital admission (past 6 weeks)</label>
+    <select id="recentAdmit">
+      <option value="0">No</option>
+      <option value="1">Yes</option>
+    </select>
+
+    <label>Anaemia</label>
+    <select id="anaemia">
+      <option value="0">No</option>
+      <option value="1">Hb &gt; 110</option>
+      <option value="3">Yes and needs investigation</option>
+    </select>
+
+    <label>On renal replacement therapy</label>
+    <select id="rrt">
+      <option value="0">No</option>
+      <option value="1">Yes</option>
+    </select>
+
+    <label>How many non-analgesic medications?</label>
+    <input type="number" id="numMeds" placeholder="Enter number" min="0">
+
+    <label>Revision surgery or complex primary</label>
+    <select id="revision">
+      <option value="0">No</option>
+      <option value="3">Yes</option>
+    </select>
+
+    <label>On Clopidogrel / Ticagrelor / Prasugrel</label>
+    <select id="antiplatelet">
+      <option value="0">No</option>
+      <option value="1">Yes</option>
+    </select>
+
+    <label>On DOAC (Apixaban / Rivaroxaban / Dabigatran etc)</label>
+    <select id="doac">
+      <option value="0">No</option>
+      <option value="1">Yes</option>
+    </select>
+
+    <label>On GLP1 agonist</label>
+    <select id="glp1">
+      <option value="0">No</option>
+      <option value="1">Yes</option>
+    </select>
+
+    <label>On Immunosuppressants</label>
+    <select id="immuno">
+      <option value="0">No</option>
+      <option value="1">Yes</option>
+    </select>
+
+    <label>Patient needs more than 24 hours notice</label>
+    <select id="notice">
+      <option value="0">No</option>
+      <option value="1">Yes</option>
+    </select>
+
+    <button onclick="calculateScore()">Calculate Score</button>
+
+    <div id="result"></div>
+  </div>
+
+  <script>
+    function calculateScore(){
+      let score = 0;
+      let breakdown = [];
+
+      // BMI
+      const bmi = parseFloat(document.getElementById('bmi').value);
+      let bmiPoints = 0;
+      if (!isNaN(bmi)){
+        if (bmi >= 50) bmiPoints = 3;
+        else if (bmi >= 40) bmiPoints = 2;
+        else if (bmi >= 35) bmiPoints = 1;
+        score += bmiPoints;
+        if(bmiPoints>0) breakdown.push(`BMI (${bmi.toFixed(1)}) = ${bmiPoints} pt${bmiPoints>1?'s':''}`);
+      }
+
+      // Regular fields (add points)
+      const fields = [
+        {id:'cardiac', label:'Cardiac issues'},
+        {id:'respiratory', label:'Respiratory issues'},
+        {id:'neurological', label:'Neurological issues'},
+        {id:'psychiatric', label:'Psychiatric issues'},
+        {id:'getOut', label:'Cannot get out of house'}, 
+        {id:'ageFlag', label:'Age threshold exceeded'},
+        {id:'recentAdmit', label:'Recent hospital admission'},
+        {id:'anaemia', label:'Anaemia'},
+        {id:'revision', label:'Revision/complex primary'},
+      ];
+
+      fields.forEach(f=>{
+        let val = parseInt(document.getElementById(f.id).value) || 0;
+        if(val>0){
+          score += val;
+          breakdown.push(`${f.label} = ${val} pt${val>1?'s':''}`);
+        }
+      });
+
+      // Non-analgesic medications
+      const meds = parseInt(document.getElementById('numMeds').value) || 0;
+      let medsPts = 0;
+      if (meds >= 5) medsPts = 1;
+      if(medsPts>0){
+        score += medsPts;
+        breakdown.push(`Non-analgesic medications (${meds}) = ${medsPts} pt${medsPts>1?'s':''}`);
+      }
+
+      // Diabetes
+      const diabetesPts = parseInt(document.getElementById('diabetes').value) || 0;
+      if(diabetesPts>0){
+        score += diabetesPts;
+        const diabetesLabel = document.getElementById('diabetes').options[document.getElementById('diabetes').selectedIndex].text;
+        breakdown.push(`Diabetes: ${diabetesLabel} = ${diabetesPts} pt${diabetesPts>1?'s':''}`);
+      }
+// Add 3 points each for antiplatelet, DOAC, immunosuppressants if "Yes"
+const extraRiskFields = [
+  { id: 'antiplatelet', label: 'On Antiplatelet (Clopidogrel/Ticagrelor/Prasugrel)' },
+  { id: 'doac', label: 'On DOAC (Apixaban/Rivaroxaban/Dabigatran etc)' },
+  { id: 'immuno', label: 'On Immunosuppressants' }
+];
+
+extraRiskFields.forEach(f => {
+  let val = parseInt(document.getElementById(f.id).value);
+  if (val > 0) {
+    score += 3;
+    breakdown.push(`${f.label} = 3 pts`);
+  }
+});
+      // Risk category
+      let risk='', riskClass='';
+      if (score >= 6){ risk='Red'; riskClass='red'; }
+      else if (score >= 3){ risk='Amber'; riskClass='amber'; }
+      else { risk='Green'; riskClass='green'; }
+
+      // Automatic same-day restriction fields
+      const autoNoFields = ['rrt','antiplatelet','doac','glp1','immuno','notice'];
+      let autoNo = autoNoFields.some(id => parseInt(document.getElementById(id).value) > 0);
+
+      // Add revision surgery or anaemia = "Yes and needs investigation"
+      if (parseInt(document.getElementById('revision').value) === 3 ||
+          parseInt(document.getElementById('anaemia').value) === 3) {
+          autoNo = true;
+      }
+
+      // Suitable to come in on same day
+      let suitable = "Yes";
+      let suitableClass = "green";
+      if(score > 8 || autoNo) {
+        suitable = "No";
+        suitableClass = "red";
+      }
+
+      // Display result — note the suitability word is wrapped in its own span so only the word is coloured
+      document.getElementById('result').innerHTML =
+        `<strong>Total Score: ${score}</strong><br>
+         <span class="${riskClass}"><strong>RAG Category: ${risk}</strong></span><br>
+         <strong>Suitable to come in on same day?:</strong> <span class="${suitableClass}">${suitable}</span>
+         <div style="margin-top:10px;">
+         <strong>Breakdown:</strong>
+         <ul>${breakdown.map(x=>`<li>${x}</li>`).join('')}</ul>
+         </div>`;
+    }
+  </script>
+</body>
+</html>
