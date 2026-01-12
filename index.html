@@ -99,9 +99,9 @@
     <label>Diabetes</label>
     <select id="diabetes">
       <option value="0">None</option>
-      <option value="0">Not on Insulin and HbA1c &lt; 69</option>
-      <option value="1">On Insulin or HbA1c &gt; 69</option>
-      <option value="3">HbA1c &gt; 100</option>
+      <option value="0">Not on Insulin and on no more than 2 diabetic medications</option>
+      <option value="1">On Insulin or more than 2 diabetic medications</option>
+      <option value="3">On Insulin and more than 2 other diabetic medications</option>
     </select>
 
     <label>Age &gt;80 for knee or &gt;85 for hip</label>
@@ -129,7 +129,7 @@
       <option value="1">Yes</option>
     </select>
 
-    <label>How many non-analgesic medications?</label>
+    <label>How many medications are you on (apart from pain killers)?</label>
     <input type="number" id="numMeds" placeholder="Enter number" min="0">
 
     <label>Revision surgery or complex primary</label>
@@ -150,7 +150,7 @@
       <option value="1">Yes</option>
     </select>
 
-    <label>On GLP1 agonist</label>
+    <label>On GLP1 agonist (Ozempic / Mounjaro / Wegovy / Tirzepatide / Rybelsus etc)</label>
     <select id="glp1">
       <option value="0">No</option>
       <option value="1">Yes</option>
