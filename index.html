@@ -189,13 +189,13 @@
         if(bmiPoints>0) breakdown.push(`BMI (${bmi.toFixed(1)}) = ${bmiPoints} pt${bmiPoints>1?'s':''}`);
       }
 
-      // Regular fields (add points)
+      // Regular fields
       const fields = [
         {id:'cardiac', label:'Cardiac issues'},
         {id:'respiratory', label:'Respiratory issues'},
         {id:'neurological', label:'Neurological issues'},
         {id:'psychiatric', label:'Psychiatric issues'},
-        {id:'getOut', label:'Cannot get out of house'}, 
+        {id:'getOut', label:'Cannot get out of house'},
         {id:'ageFlag', label:'Age threshold exceeded'},
         {id:'recentAdmit', label:'Recent hospital admission'},
         {id:'anaemia', label:'Anaemia'},
@@ -210,13 +210,11 @@
         }
       });
 
-      // Non-analgesic medications
+      // Medications count
       const meds = parseInt(document.getElementById('numMeds').value) || 0;
-      let medsPts = 0;
-      if (meds >= 5) medsPts = 1;
-      if(medsPts>0){
-        score += medsPts;
-        breakdown.push(`Non-analgesic medications (${meds}) = ${medsPts} pt${medsPts>1?'s':''}`);
+      if (meds >= 5){
+        score += 1;
+        breakdown.push(`Non-analgesic medications (${meds}) = 1 pt`);
       }
 
       // Diabetes
@@ -226,37 +224,37 @@
         const diabetesLabel = document.getElementById('diabetes').options[document.getElementById('diabetes').selectedIndex].text;
         breakdown.push(`Diabetes: ${diabetesLabel} = ${diabetesPts} pt${diabetesPts>1?'s':''}`);
       }
-// Add 3 points each for antiplatelet, DOAC, immunosuppressants if "Yes"
-const extraRiskFields = [
-  { id: 'antiplatelet', label: 'On Antiplatelet (Clopidogrel/Ticagrelor/Prasugrel)' },
-  { id: 'doac', label: 'On DOAC (Apixaban/Rivaroxaban/Dabigatran etc)' },
-  { id: 'immuno', label: 'On Immunosuppressants' }
-];
 
-extraRiskFields.forEach(f => {
-  let val = parseInt(document.getElementById(f.id).value);
-  if (val > 0) {
-    score += 3;
-    breakdown.push(`${f.label} = 3 pts`);
-  }
-});
-      // Risk category
+      // Extra risk meds (add 3 points)
+      const extraRiskFields = [
+        { id: 'antiplatelet', label: 'On Antiplatelet' },
+        { id: 'doac', label: 'On DOAC' },
+        { id: 'immuno', label: 'On Immunosuppressants' }
+      ];
+
+      extraRiskFields.forEach(f => {
+        let val = parseInt(document.getElementById(f.id).value);
+        if (val > 0) {
+          score += 3;
+          breakdown.push(`${f.label} = 3 pts`);
+        }
+      });
+
+      // RAG category
       let risk='', riskClass='';
       if (score >= 6){ risk='Red'; riskClass='red'; }
       else if (score >= 3){ risk='Amber'; riskClass='amber'; }
       else { risk='Green'; riskClass='green'; }
 
-      // Automatic same-day restriction fields
+      // Same-day suitability
       const autoNoFields = ['rrt','antiplatelet','doac','glp1','immuno','notice'];
       let autoNo = autoNoFields.some(id => parseInt(document.getElementById(id).value) > 0);
 
-      // Add revision surgery or anaemia = "Yes and needs investigation"
       if (parseInt(document.getElementById('revision').value) === 3 ||
           parseInt(document.getElementById('anaemia').value) === 3) {
-          autoNo = true;
+        autoNo = true;
       }
 
-      // Suitable to come in on same day
       let suitable = "Yes";
       let suitableClass = "green";
       if(score > 8 || autoNo) {
@@ -264,11 +262,37 @@ extraRiskFields.forEach(f => {
         suitableClass = "red";
       }
 
-      // Display result — note the suitability word is wrapped in its own span so only the word is coloured
+      // Suitable for 4 joint list + tooltip
+      let fourJoint = "Yes";
+      let fourJointClass = "green";
+      let fourJointReason = "";
+
+      let reasons = [];
+
+      if (risk !== 'Green') {
+        reasons.push(`RAG pathway is ${risk}`);
+      }
+
+      if (!isNaN(bmi) && bmi >= 35) {
+        reasons.push(`BMI is ${bmi.toFixed(1)} (≥ 35)`);
+      }
+
+      if (reasons.length > 0) {
+        fourJoint = "No";
+        fourJointClass = "red";
+        fourJointReason = reasons.join(" and ");
+      }
+
+      // Display result
       document.getElementById('result').innerHTML =
         `<strong>Total Score: ${score}</strong><br>
          <span class="${riskClass}"><strong>RAG Category: ${risk}</strong></span><br>
-         <strong>Suitable to come in on same day?:</strong> <span class="${suitableClass}">${suitable}</span>
+         <strong>Suitable to come in on same day?:</strong>
+         <span class="${suitableClass}">${suitable}</span><br>
+         <strong>Suitable for 4 joint list?:</strong>
+         <span class="${fourJointClass}" title="${fourJointReason}">
+           ${fourJoint}
+         </span>
          <div style="margin-top:10px;">
          <strong>Breakdown:</strong>
          <ul>${breakdown.map(x=>`<li>${x}</li>`).join('')}</ul>
