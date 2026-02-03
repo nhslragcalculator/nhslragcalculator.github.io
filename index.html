@@ -266,10 +266,43 @@
         breakdown.push(`Diabetes: ${diabetesLabel} = ${diabetesPts} pt${diabetesPts>1?'s':''}`);
       }
 
-// Different scoring for these three
+// -----------------------------
+// VARIABLE SCORING FOR DOAC & ANTIPLATELET
+// -----------------------------
+
 const antiplatelet = parseInt(document.getElementById('antiplatelet').value);
 const doac = parseInt(document.getElementById('doac').value);
 const immuno = parseInt(document.getElementById('immuno').value);
+
+// 🔹 Capture the score BEFORE adding DOAC or Antiplatelet
+let baseScore = score;
+
+function getDrugPoints(base) {
+  if (base === 0) return 3;
+  if (base === 1) return 2;
+  if (base === 2) return 1;
+  return 0; // base >= 3
+}
+
+const variablePoints = getDrugPoints(baseScore);
+
+// Apply to Antiplatelet
+if (antiplatelet > 0) {
+  score += variablePoints;
+  breakdown.push(`On Antiplatelet = ${variablePoints} pt${variablePoints !== 1 ? 's' : ''}`);
+}
+
+// Apply to DOAC
+if (doac > 0) {
+  score += variablePoints;
+  breakdown.push(`On DOAC = ${variablePoints} pt${variablePoints !== 1 ? 's' : ''}`);
+}
+
+// Immunosuppressants still fixed at 3 points (unchanged)
+if (immuno > 0) {
+  score += 3;
+  breakdown.push('On Immunosuppressants = 3 pts');
+}
 
 // Antiplatelet = 2 points
 if (antiplatelet > 0) {
