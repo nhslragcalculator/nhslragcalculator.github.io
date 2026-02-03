@@ -266,19 +266,28 @@
         breakdown.push(`Diabetes: ${diabetesLabel} = ${diabetesPts} pt${diabetesPts>1?'s':''}`);
       }
 
-      const extraRiskFields = [
-        { id: 'antiplatelet', label: 'On Antiplatelet' },
-        { id: 'doac', label: 'On DOAC' },
-        { id: 'immuno', label: 'On Immunosuppressants' }
-      ];
+// Different scoring for these three
+const antiplatelet = parseInt(document.getElementById('antiplatelet').value);
+const doac = parseInt(document.getElementById('doac').value);
+const immuno = parseInt(document.getElementById('immuno').value);
 
-      extraRiskFields.forEach(f => {
-        let val = parseInt(document.getElementById(f.id).value);
-        if (val > 0) {
-          score += 3;
-          breakdown.push(`${f.label} = 3 pts`);
-        }
-      });
+// Antiplatelet = 2 points
+if (antiplatelet > 0) {
+  score += 2;
+  breakdown.push('On Antiplatelet = 2 pts');
+}
+
+// DOAC = 2 points
+if (doac > 0) {
+  score += 2;
+  breakdown.push('On DOAC = 2 pts');
+}
+
+// Immunosuppressants = 3 points
+if (immuno > 0) {
+  score += 3;
+  breakdown.push('On Immunosuppressants = 3 pts');
+}
 
       let risk='', riskClass='';
       if (score >= 6){ risk='Red'; riskClass='red'; }
