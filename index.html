@@ -310,11 +310,22 @@ if (antiplatelet > 0) {
   breakdown.push('On Antiplatelet = 2 pts');
 }
 
-// ---- VARIABLE SCORING FOR ANTIPLATELET & DOAC ----
+// -----------------------------
+// VARIABLE SCORING FOR DOAC & ANTIPLATELET (CLEAN VERSION)
+// -----------------------------
 
-// At this point, 'score' includes everything EXCEPT antiplatelet + DOAC
+const antiplatelet = parseInt(document.getElementById('antiplatelet').value) || 0;
+const doac = parseInt(document.getElementById('doac').value) || 0;
+const immuno = parseInt(document.getElementById('immuno').value) || 0;
 
-let baseScore = score; // store current total before adding these
+// First: add immunosuppressants (these are NOT part of the variable rule)
+if (immuno > 0) {
+  score += 3;
+  breakdown.push('On Immunosuppressants = 3 pts');
+}
+
+// 👉 NOW capture the score BEFORE adding DOAC or Antiplatelet
+let baseScore = score;
 
 function getDrugPoints(base) {
   if (base === 0) return 3;
@@ -325,18 +336,17 @@ function getDrugPoints(base) {
 
 const variablePoints = getDrugPoints(baseScore);
 
-// Antiplatelet
+// Apply variable points to Antiplatelet
 if (antiplatelet > 0) {
   score += variablePoints;
   breakdown.push(`On Antiplatelet = ${variablePoints} pt${variablePoints !== 1 ? 's' : ''}`);
 }
 
-// DOAC
+// Apply variable points to DOAC
 if (doac > 0) {
   score += variablePoints;
   breakdown.push(`On DOAC = ${variablePoints} pt${variablePoints !== 1 ? 's' : ''}`);
 }
-
       let risk='', riskClass='';
       if (score >= 6){ risk='Red'; riskClass='red'; }
       else if (score >= 3){ risk='Amber'; riskClass='amber'; }
