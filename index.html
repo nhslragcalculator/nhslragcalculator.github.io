@@ -277,16 +277,31 @@ if (antiplatelet > 0) {
   breakdown.push('On Antiplatelet = 2 pts');
 }
 
-// DOAC = 2 points
-if (doac > 0) {
-  score += 2;
-  breakdown.push('On DOAC = 2 pts');
+// ---- VARIABLE SCORING FOR ANTIPLATELET & DOAC ----
+
+// At this point, 'score' includes everything EXCEPT antiplatelet + DOAC
+
+let baseScore = score; // store current total before adding these
+
+function getDrugPoints(base) {
+  if (base === 0) return 3;
+  if (base === 1) return 2;
+  if (base === 2) return 1;
+  return 0; // base >= 3
 }
 
-// Immunosuppressants = 3 points
-if (immuno > 0) {
-  score += 3;
-  breakdown.push('On Immunosuppressants = 3 pts');
+const variablePoints = getDrugPoints(baseScore);
+
+// Antiplatelet
+if (antiplatelet > 0) {
+  score += variablePoints;
+  breakdown.push(`On Antiplatelet = ${variablePoints} pt${variablePoints !== 1 ? 's' : ''}`);
+}
+
+// DOAC
+if (doac > 0) {
+  score += variablePoints;
+  breakdown.push(`On DOAC = ${variablePoints} pt${variablePoints !== 1 ? 's' : ''}`);
 }
 
       let risk='', riskClass='';
