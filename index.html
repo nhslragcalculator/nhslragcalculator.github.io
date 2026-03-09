@@ -131,7 +131,7 @@
       <option value="3">Yes, and I have ongoing symptoms</option>
     </select>
 
-    <label>Can they get out of the house on their own?</label>
+    <label>Can you get out of the house on their own?</label>
     <select id="getOut">
       <option value="0">Yes</option>
       <option value="1">No</option>
@@ -152,6 +152,12 @@
     </select>
 
     <label>Recent hospital admission (past 6 weeks)</label>
+    <select id="recentAdmit">
+      <option value="0">No</option>
+      <option value="1">Yes</option>
+    </select>
+
+    <label>Are you attending or have you been referred to a Hospital specialist?</label>
     <select id="recentAdmit">
       <option value="0">No</option>
       <option value="1">Yes</option>
@@ -203,7 +209,7 @@
       <option value="1">Yes</option>
     </select>
 
-    <label>Patient needs more than 24 hours notice</label>
+    <label>Do you need more than 24 hours notice?</label>
     <select id="notice">
       <option value="0">No</option>
       <option value="1">Yes</option>
@@ -239,6 +245,7 @@
         {id:'neurological', label:'Neurological issues'},
         {id:'psychiatric', label:'Psychiatric issues'},
         {id:'getOut', label:'Cannot get out of house'},
+        {id:'specialist', label:'Awaiting specialist referral'},
         {id:'ageFlag', label:'Age threshold exceeded'},
         {id:'recentAdmit', label:'Recent hospital admission'},
         {id:'anaemia', label:'Anaemia'},
