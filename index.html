@@ -19,8 +19,39 @@
       padding:24px;
       border-radius:10px;
       box-shadow:0 4px 12px rgba(0,0,0,0.1);
+      position: relative; /* Needed to anchor the reset button */
     }
     h1{margin-top:0}
+    
+    /* Reset Button Style */
+    .reset-btn {
+      position: absolute;
+      top: 20px;
+      right: 24px;
+      background: #6c757d;
+      color: white;
+      border: none;
+      padding: 6px 12px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: bold;
+      transition: background 0.2s;
+    }
+    .reset-btn:hover { background: #5a6268; }
+
+    fieldset {
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      padding: 15px;
+      margin-bottom: 20px;
+    }
+    legend {
+      font-weight: bold;
+      padding: 0 10px;
+      color: #007bff;
+    }
+
     label{display:block;margin-top:12px;font-weight:bold}
     input,select{
       width:100%;
@@ -30,7 +61,7 @@
       border:1px solid #ccc;
       border-radius:6px;
     }
-    button{
+    .calc-btn{
       margin-top:20px;
       padding:10px 14px;
       background:#007bff;
@@ -39,8 +70,10 @@
       border-radius:6px;
       cursor:pointer;
       font-weight:bold;
+      width: 100%;
     }
-    button:hover{background:#0056b3;}
+    .calc-btn:hover{background:#0056b3;}
+
     #result{
       margin-top:20px;
       padding:14px;
@@ -54,16 +87,15 @@
     ul{margin-top:6px; padding-left:18px;}
     li{margin-bottom:4px;}
 
-    /* Black info icon with tooltip */
     .info-icon {
       display: inline-block;
       width: 16px;
       height: 16px;
       line-height: 16px;
       border-radius: 50%;
-      border: 1.5px solid #000; /* black outline */
-      background: transparent;   /* transparent inside */
-      color: #000;               /* black "i" */
+      border: 1.5px solid #000;
+      background: transparent;
+      color: #000;
       text-align: center;
       font-size: 12px;
       font-weight: bold;
@@ -76,8 +108,8 @@
       opacity: 0;
       width: max-content;
       max-width: 250px;
-      background-color: #000; /* black background */
-      color: #fff;            /* white text */
+      background-color: #000;
+      color: #fff;
       text-align: left;
       border-radius: 6px;
       padding: 6px 10px;
@@ -98,129 +130,150 @@
 </head>
 <body>
   <div class="container">
+    <button class="reset-btn" onclick="resetForm()">Reset</button>
     <h1>RAG Calculator</h1>
 
-    <label>BMI</label>
-    <input type="number" id="bmi" placeholder="Enter BMI" step="0.1" min="0">
+    <fieldset>
+      <legend>General & Logistics</legend>
+      <label>BMI</label>
+      <input type="number" id="bmi" placeholder="Enter BMI" step="0.1" min="0">
 
-    <label>Cardiac issues</label>
-    <select id="cardiac">
-      <option value="0">None</option>
-      <option value="1">Yes in the past but I have no/minimal symptoms now</option>
-      <option value="3">Yes, and I have ongoing symptoms</option>
-    </select>
+      <label>Age &gt;80 for knee or &gt;85 for hip</label>
+      <select id="ageFlag">
+        <option value="0">No</option>
+        <option value="1">Yes</option>
+      </select>
 
-    <label>Respiratory issues</label>
-    <select id="respiratory">
-      <option value="0">None</option>
-      <option value="1">Yes in the past but I have no/minimal symptoms now</option>
-      <option value="3">Yes, and I have ongoing symptoms</option>
-    </select>
+      <label>Can you get out of the house on your own?</label>
+      <select id="getOut">
+        <option value="0">Yes</option>
+        <option value="1">No</option>
+      </select>
 
-    <label>Neurological issues</label>
-    <select id="neurological">
-      <option value="0">None</option>
-      <option value="1">Yes in the past but I have no/minimal symptoms now</option>
-      <option value="3">Yes, and I have ongoing symptoms</option>
-    </select>
+      <label>Recent hospital admission (past 6 weeks)</label>
+      <select id="recentAdmit">
+        <option value="0">No</option>
+        <option value="2">Yes</option>
+      </select>
 
-    <label>Psychiatric issues</label>
-    <select id="psychiatric">
-      <option value="0">None</option>
-      <option value="1">Yes in the past but I have no/minimal symptoms now</option>
-      <option value="3">Yes, and I have ongoing symptoms</option>
-    </select>
+      <label>Are you attending or have you been referred to a Hospital specialist?</label>
+      <select id="specialist">
+        <option value="0">No</option>
+        <option value="1">Yes</option>
+      </select>
 
-    <label>Can you get out of the house on your own?</label>
-    <select id="getOut">
-      <option value="0">Yes</option>
-      <option value="1">No</option>
-    </select>
+      <label>Do you need more than 24 hours notice?</label>
+      <select id="notice">
+        <option value="0">No</option>
+        <option value="1">Yes</option>
+      </select>
 
-    <label>Diabetes</label>
-    <select id="diabetes">
-      <option value="0">None</option>
-      <option value="1">Well controlled diabetes with no more than 2 medications</option>
-      <option value="2">On Insulin or more than 2 diabetic medications</option>
-      <option value="3">On Insulin and more than 2 other diabetic medications</option>
-    </select>
+      <label>Revision surgery, complex primary or bilateral joints</label>
+      <select id="revision">
+        <option value="0">No</option>
+        <option value="3">Yes</option>
+      </select>
+    </fieldset>
 
-    <label>Age &gt;80 for knee or &gt;85 for hip</label>
-    <select id="ageFlag">
-      <option value="0">No</option>
-      <option value="1">Yes</option>
-    </select>
+    <fieldset>
+      <legend>Medical History</legend>
+      <label>Cardiac issues</label>
+      <select id="cardiac">
+        <option value="0">None</option>
+        <option value="1">Yes in the past but I have no/minimal symptoms now</option>
+        <option value="3">Yes, and I have ongoing symptoms</option>
+      </select>
 
-    <label>Recent hospital admission (past 6 weeks)</label>
-    <select id="recentAdmit">
-      <option value="0">No</option>
-      <option value="2">Yes</option>
-    </select>
+      <label>Respiratory issues</label>
+      <select id="respiratory">
+        <option value="0">None</option>
+        <option value="1">Yes in the past but I have no/minimal symptoms now</option>
+        <option value="3">Yes, and I have ongoing symptoms</option>
+      </select>
 
-    <label>Are you attending or have you been referred to a Hospital specialist?</label>
-    <select id="specialist">
-      <option value="0">No</option>
-      <option value="1">Yes</option>
-    </select>
+      <label>Neurological issues</label>
+      <select id="neurological">
+        <option value="0">None</option>
+        <option value="1">Yes in the past but I have no/minimal symptoms now</option>
+        <option value="3">Yes, and I have ongoing symptoms</option>
+      </select>
 
-    <label>Are you known to be anaemic or have any other haematological issues?</label>
-    <select id="anaemia">
-      <option value="0">No / Don't know</option>
-      <option value="1">Yes - stable and receiving treatment</option>
-      <option value="3">Yes and waiting for further investigations</option>
-    </select>
+      <label>Psychiatric issues</label>
+      <select id="psychiatric">
+        <option value="0">None</option>
+        <option value="1">Yes in the past but I have no/minimal symptoms now</option>
+        <option value="3">Yes, and I have ongoing symptoms</option>
+      </select>
 
-    <label>On renal replacement therapy</label>
-    <select id="rrt">
-      <option value="0">No</option>
-      <option value="1">Yes</option>
-    </select>
+      <label>Diabetes</label>
+      <select id="diabetes">
+        <option value="0">None</option>
+        <option value="1">Well controlled diabetes with no more than 2 medications</option>
+        <option value="2">On Insulin or more than 2 diabetic medications</option>
+        <option value="3">On Insulin and more than 2 other diabetic medications</option>
+      </select>
 
-    <label>How many medications are you on (apart from pain killers)?</label>
-    <input type="number" id="numMeds" placeholder="Enter number" min="0">
+      <label>Are you known to be anaemic or have any other haematological issues?</label>
+      <select id="anaemia">
+        <option value="0">No / Don't know</option>
+        <option value="1">Yes - stable and receiving treatment</option>
+        <option value="3">Yes and waiting for further investigations</option>
+      </select>
 
-    <label>Revision surgery, complex primary or bilateral joints</label>
-    <select id="revision">
-      <option value="0">No</option>
-      <option value="3">Yes</option>
-    </select>
+      <label>On renal replacement therapy</label>
+      <select id="rrt">
+        <option value="0">No</option>
+        <option value="1">Yes</option>
+      </select>
+    </fieldset>
 
-    <label>On Clopidogrel / Ticagrelor / Prasugrel</label>
-    <select id="antiplatelet">
-      <option value="0">No</option>
-      <option value="1">Yes</option>
-    </select>
+    <fieldset>
+      <legend>Medications</legend>
+      <label>How many medications are you on (apart from pain killers)?</label>
+      <input type="number" id="numMeds" placeholder="Enter number" min="0">
 
-    <label>On DOAC (Apixaban / Rivaroxaban / Dabigatran etc)</label>
-    <select id="doac">
-      <option value="0">No</option>
-      <option value="1">Yes</option>
-    </select>
+      <label>On Clopidogrel / Ticagrelor / Prasugrel</label>
+      <select id="antiplatelet">
+        <option value="0">No</option>
+        <option value="1">Yes</option>
+      </select>
 
-    <label>On GLP1 agonist (Ozempic / Mounjaro / Wegovy / Tirzepatide / Rybelsus etc)</label>
-    <select id="glp1">
-      <option value="0">No</option>
-      <option value="1">Yes</option>
-    </select>
+      <label>On DOAC (Apixaban / Rivaroxaban / Dabigatran etc)</label>
+      <select id="doac">
+        <option value="0">No</option>
+        <option value="1">Yes</option>
+      </select>
 
-    <label>On Immunosuppressants</label>
-    <select id="immuno">
-      <option value="0">No</option>
-      <option value="1">Yes</option>
-    </select>
+      <label>On GLP1 agonist (Ozempic / Mounjaro / Wegovy / Tirzepatide / Rybelsus etc)</label>
+      <select id="glp1">
+        <option value="0">No</option>
+        <option value="1">Yes</option>
+      </select>
 
-    <label>Do you need more than 24 hours notice?</label>
-    <select id="notice">
-      <option value="0">No</option>
-      <option value="1">Yes</option>
-    </select>
+      <label>On Immunosuppressants (apart from Prednisolone)</label>
+      <select id="immuno">
+        <option value="0">No</option>
+        <option value="1">Yes</option>
+      </select>
+    </fieldset>
 
-    <button onclick="calculateScore()">Calculate Score</button>
+    <button class="calc-btn" onclick="calculateScore()">Calculate Score</button>
 
     <div id="result"></div>
   </div>
 
   <script>
+    function resetForm() {
+      // Clear numeric inputs
+      document.querySelectorAll('input').forEach(input => input.value = '');
+      // Reset dropdowns
+      document.querySelectorAll('select').forEach(select => select.selectedIndex = 0);
+      // Clear result display
+      document.getElementById('result').innerHTML = '';
+      // Scroll to top
+      window.scrollTo({top: 0, behavior: 'smooth'});
+    }
+
     function calculateScore(){
       let score = 0;
       let breakdown = [];
@@ -238,7 +291,7 @@
         if (bmiPoints>0) breakdown.push(`BMI (${bmi.toFixed(1)}) = ${bmiPoints} pt${bmiPoints>1?'s':''}`);
       }
 
-      // Core fields
+      // Core fixed fields
       const fields = [
         {id:'cardiac', label:'Cardiac issues'},
         {id:'respiratory', label:'Respiratory issues'},
@@ -248,8 +301,7 @@
         {id:'specialist', label:'Awaiting specialist referral'},
         {id:'ageFlag', label:'Age threshold exceeded'},
         {id:'recentAdmit', label:'Recent hospital admission'},
-        {id:'anaemia', label:'Anaemia/Haematology'},
-        {id:'revision', label:'Revision/complex primary'},
+        {id:'anaemia', label:'Anaemia/Haematology'}
       ];
 
       fields.forEach(f=>{
@@ -260,7 +312,7 @@
         }
       });
 
-      // Medications
+      // Medications count
       const meds = parseInt(document.getElementById('numMeds').value)||0;
       if(meds>=5){
         score += 1;
@@ -275,54 +327,53 @@
         breakdown.push(`Diabetes: ${diabetesLabel} = ${diabetesPts} pt${diabetesPts>1?'s':''}`);
       }
 
-      // -----------------------------
-      // DOAC & Antiplatelet variable scoring
-      // -----------------------------
-      const antiplatelet = parseInt(document.getElementById('antiplatelet').value)||0;
-      const doac = parseInt(document.getElementById('doac').value)||0;
-      const immuno = parseInt(document.getElementById('immuno').value)||0;
-
       // Immunosuppressants fixed 3 points
+      const immuno = parseInt(document.getElementById('immuno').value)||0;
       if(immuno>0){
         score += 3;
         breakdown.push('On Immunosuppressants = 3 pts');
       }
 
-      // Base score before DOAC/Antiplatelet
-      let baseScore = score;
+      // Variable points
+      function getTopUpPoints(currentScore) {
+        if(currentScore === 0) return 3;
+        if(currentScore === 1) return 2;
+        if(currentScore === 2) return 1;
+        return 0;
+      }
+      
+      const revision = parseInt(document.getElementById('revision').value)||0;
+      const antiplatelet = parseInt(document.getElementById('antiplatelet').value)||0;
+      const doac = parseInt(document.getElementById('doac').value)||0;
 
-      function getDrugPoints(base){
-        if(base===0) return 3;
-        if(base===1) return 2;
-        if(base===2) return 1;
-        return 0; // base >=3
+      if(revision > 0) {
+        let pts = getTopUpPoints(score);
+        score += pts;
+        breakdown.push(`Surgical Complexity = ${pts} pt${pts!==1?'s':''}`);
       }
 
-      const variablePoints = getDrugPoints(baseScore);
-
-      // Apply variable points
-      if(antiplatelet>0){
-        score += variablePoints;
-        breakdown.push(`On Antiplatelet = ${variablePoints} pt${variablePoints!==1?'s':''}`);
-      }
-      if(doac>0){
-        score += variablePoints;
-        breakdown.push(`On DOAC = ${variablePoints} pt${variablePoints!==1?'s':''}`);
+      if(antiplatelet > 0) {
+        let pts = getTopUpPoints(score);
+        score += pts;
+        breakdown.push(`On Antiplatelet = ${pts} pt${pts!==1?'s':''}`);
       }
 
-      // -----------------------------
-      // RAG Category
-      // -----------------------------
+      if(doac > 0) {
+        let pts = getTopUpPoints(score);
+        score += pts;
+        breakdown.push(`On DOAC = ${pts} pt${pts!==1?'s':''}`);
+      }
+
       let risk='', riskClass='';
       if(score>=6){ risk='Red'; riskClass='red'; }
       else if(score>=3){ risk='Amber'; riskClass='amber'; }
       else { risk='Green'; riskClass='green'; }
 
-      // Auto No checks
       const autoNoFields = ['rrt','antiplatelet','doac','glp1','immuno','notice'];
       let autoNo = autoNoFields.some(id => parseInt(document.getElementById(id).value)>0);
-      if(parseInt(document.getElementById('revision').value)===3 || parseInt(document.getElementById('anaemia').value)===3){
-        autoNo=true;
+      
+      if(parseInt(document.getElementById('revision').value) > 0 || parseInt(document.getElementById('anaemia').value) === 3){
+        autoNo = true;
       }
 
       let suitable="Yes", suitableClass="green";
@@ -334,7 +385,6 @@
       if(!isNaN(bmi) && bmi>=35) reasons.push(`BMI is ${bmi.toFixed(1)} (≥ 35)`);
       if(reasons.length>0){ fourJoint="No"; fourJointClass="red"; fourJointReason=reasons.join(" and "); }
 
-      // Output
       document.getElementById('result').innerHTML=
         `<strong>Total Score: ${score}</strong><br>
          <span class="${riskClass}"><strong>RAG Category: ${risk}</strong></span><br>
