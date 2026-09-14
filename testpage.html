@@ -29,6 +29,11 @@
     #qr-container { margin-top: 25px; padding-top: 20px; border-top: 1px solid #ccc; display: flex; flex-direction: column; align-items: center; text-align: center; }
     #qrcode img { margin-top: 15px; border: 10px solid #fff; border-radius: 4px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
     .qr-hint { font-size: 12px; color: #666; margin-top: 8px; max-width: 300px; }
+    
+    .bmi-calc-box { background: #f8f9fb; padding: 12px; border-radius: 8px; border: 1px solid #e0e4ea; margin-bottom: 15px; margin-top: 10px; }
+    .bmi-calc-box label { font-size: 13px; font-weight: normal; margin-top: 0; color: #555; }
+    .flex-row { display: flex; gap: 10px; margin-bottom: 8px; }
+    .flex-row > div { flex: 1; }
   </style>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 </head>
@@ -39,8 +44,56 @@
 
     <fieldset>
       <legend>General & Logistics</legend>
+
+      <!-- Height/Weight BMI Calculator -->
+      <div class="bmi-calc-box">
+        <label for="unitSystem" style="font-weight: bold; color: #222; margin-bottom: 5px;">Auto-Calculate BMI (Optional)</label>
+        <select id="unitSystem" onchange="toggleUnits()" style="margin-bottom: 12px;">
+          <option value="metric">Metric (cm & kg)</option>
+          <option value="imperial">Imperial (ft/in & st/lbs)</option>
+        </select>
+
+        <!-- Metric Inputs -->
+        <div id="metricInputs">
+          <div class="flex-row">
+            <div>
+              <label for="heightCm">Height (cm)</label>
+              <input type="number" id="heightCm" placeholder="cm" min="0" oninput="autoCalcBMI()">
+            </div>
+            <div>
+              <label for="weightKg">Weight (kg)</label>
+              <input type="number" id="weightKg" placeholder="kg" min="0" step="0.1" oninput="autoCalcBMI()">
+            </div>
+          </div>
+        </div>
+
+        <!-- Imperial Inputs -->
+        <div id="imperialInputs" style="display: none;">
+          <div class="flex-row">
+            <div>
+              <label for="heightFt">Height (ft)</label>
+              <input type="number" id="heightFt" placeholder="ft" min="0" oninput="autoCalcBMI()">
+            </div>
+            <div>
+              <label for="heightIn">Height (in)</label>
+              <input type="number" id="heightIn" placeholder="in" min="0" oninput="autoCalcBMI()">
+            </div>
+          </div>
+          <div class="flex-row">
+            <div>
+              <label for="weightSt">Weight (stones)</label>
+              <input type="number" id="weightSt" placeholder="st" min="0" oninput="autoCalcBMI()">
+            </div>
+            <div>
+              <label for="weightLbs">Weight (lbs)</label>
+              <input type="number" id="weightLbs" placeholder="lbs" min="0" oninput="autoCalcBMI()">
+            </div>
+          </div>
+        </div>
+      </div>
+
       <label for="bmi">BMI</label>
-      <input type="number" id="bmi" placeholder="Enter BMI" step="0.1" min="0">
+      <input type="number" id="bmi" placeholder="Enter BMI manually or use calculator above" step="0.1" min="0">
 
       <label for="ageFlag">Age &gt;80 for knee or &gt;85 for hip</label>
       <select id="ageFlag">
@@ -166,12 +219,54 @@
   </div>
 
   <script>
-    // 1. On Page Load, Check for URL Parameters and auto-fill
+    // Toggle metric vs imperial inputs
+    function toggleUnits() {
+      const sys = document.getElementById('unitSystem').value;
+      if (sys === 'metric') {
+        document.getElementById('metricInputs').style.display = 'block';
+        document.getElementById('imperialInputs').style.display = 'none';
+      } else {
+        document.getElementById('metricInputs').style.display = 'none';
+        document.getElementById('imperialInputs').style.display = 'block';
+      }
+    }
+
+    // Auto-calculate BMI based on active inputs
+    function autoCalcBMI() {
+      const sys = document.getElementById('unitSystem').value;
+      let bmi = 0;
+
+      if (sys === 'metric') {
+        const cm = parseFloat(document.getElementById('heightCm').value);
+        const kg = parseFloat(document.getElementById('weightKg').value);
+        if (cm > 0 && kg > 0) {
+          const m = cm / 100;
+          bmi = kg / (m * m);
+        }
+      } else {
+        const ft = parseFloat(document.getElementById('heightFt').value) || 0;
+        const inch = parseFloat(document.getElementById('heightIn').value) || 0;
+        const st = parseFloat(document.getElementById('weightSt').value) || 0;
+        const lbs = parseFloat(document.getElementById('weightLbs').value) || 0;
+
+        const totalInches = (ft * 12) + inch;
+        const totalLbs = (st * 14) + lbs;
+
+        if (totalInches > 0 && totalLbs > 0) {
+          bmi = 703 * totalLbs / (totalInches * totalInches);
+        }
+      }
+
+      if (bmi > 0) {
+        document.getElementById('bmi').value = bmi.toFixed(1);
+      }
+    }
+
+    // On Page Load, Check for URL Parameters and auto-fill
     window.addEventListener('DOMContentLoaded', () => {
       const params = new URLSearchParams(window.location.search);
       let hasData = false;
 
-      // Loop through parameters and set the form values
       params.forEach((value, key) => {
         const element = document.getElementById(key);
         if (element) {
@@ -179,9 +274,10 @@
           hasData = true;
         }
       });
-
-      // If parameters existed, auto-calculate
+      
+      // Ensure the correct unit tab is visible based on URL parameters
       if (hasData) {
+        toggleUnits();
         calculateScore();
       }
     });
@@ -191,7 +287,10 @@
       document.querySelectorAll('select').forEach(select => select.selectedIndex = 0);
       document.getElementById('result').innerHTML = '';
       
-      // Clear URL parameters without reloading the page
+      // Reset unit toggle specifically
+      document.getElementById('unitSystem').value = 'metric';
+      toggleUnits();
+      
       const baseUrl = window.location.protocol + "//" + window.location.host + window.location.pathname;
       window.history.pushState({path: baseUrl}, '', baseUrl);
       
@@ -313,7 +412,7 @@
         fourJointReason = reasons.join(" and "); 
       }
 
-      // Render the Results, including the QR container
+      // Render the Results
       document.getElementById('result').innerHTML = `
         <strong>Total Score: ${score}</strong><br>
         <span class="${riskClass}"><strong>RAG Category: ${risk}</strong></span><br>
@@ -337,13 +436,12 @@
         </div>
       `;
 
-      // 2. Build the URL params for sharing/saving
+      // Build the URL params for sharing/saving
       const localBaseUrl = window.location.protocol + "//" + window.location.host + window.location.pathname;
-      const qrBaseUrl = "https://www.nhslragcalculator.com"; // Fixed external URL for the QR code
+      const qrBaseUrl = "https://www.nhslragcalculator.com"; 
       const params = new URLSearchParams();
 
       document.querySelectorAll('input, select').forEach(input => {
-        // Only add to the URL if the value is not empty and not the default "0"
         if (input.tagName === 'SELECT' && input.selectedIndex > 0) {
           params.set(input.id, input.value);
         } else if (input.tagName === 'INPUT' && input.value.trim() !== '') {
@@ -357,10 +455,10 @@
       const finalLocalUrl = queryString ? `${localBaseUrl}?${queryString}` : localBaseUrl;
       window.history.replaceState({}, '', finalLocalUrl);
 
-      // Create the URL strictly for the QR code targeting nhslragcalculator.com
+      // Create the URL specifically for the QR code targeting nhslragcalculator.com
       const finalQrUrl = queryString ? `${qrBaseUrl}?${queryString}` : qrBaseUrl;
 
-      // 3. Generate the QR Code using the fixed nhslragcalculator URL
+      // Generate the QR Code using the fixed nhslragcalculator URL
       new QRCode(document.getElementById("qrcode"), {
         text: finalQrUrl,
         width: 200,
