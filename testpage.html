@@ -166,7 +166,7 @@
   </div>
 
   <script>
-    // --- 1. NEW: On Page Load, Check for URL Parameters ---
+    // 1. On Page Load, Check for URL Parameters and auto-fill
     window.addEventListener('DOMContentLoaded', () => {
       const params = new URLSearchParams(window.location.search);
       let hasData = false;
@@ -313,7 +313,7 @@
         fourJointReason = reasons.join(" and "); 
       }
 
-      // Render the Results
+      // Render the Results, including the QR container
       document.getElementById('result').innerHTML = `
         <strong>Total Score: ${score}</strong><br>
         <span class="${riskClass}"><strong>RAG Category: ${risk}</strong></span><br>
@@ -337,7 +337,7 @@
         </div>
       `;
 
-      // --- 2. NEW: Build the URL with parameters for the QR Code ---
+      // 2. Build the URL with parameters for sharing/saving and for the QR code
       const baseUrl = window.location.protocol + "//" + window.location.host + window.location.pathname;
       const params = new URLSearchParams();
 
@@ -350,14 +350,12 @@
         }
       });
 
-      // Construct final URL
+      // Construct final URL and replace it in the browser's address bar
       const queryString = params.toString();
       const finalUrl = queryString ? `${baseUrl}?${queryString}` : baseUrl;
-
-      // Update the browser URL without reloading (so the user can copy/paste the link too)
       window.history.replaceState({}, '', finalUrl);
 
-      // Generate the QR Code with the URL
+      // 3. Generate the QR Code using the final URL
       new QRCode(document.getElementById("qrcode"), {
         text: finalUrl,
         width: 200,
