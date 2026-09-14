@@ -337,8 +337,9 @@
         </div>
       `;
 
-      // 2. Build the URL with parameters for sharing/saving and for the QR code
-      const baseUrl = window.location.protocol + "//" + window.location.host + window.location.pathname;
+      // 2. Build the URL params for sharing/saving
+      const localBaseUrl = window.location.protocol + "//" + window.location.host + window.location.pathname;
+      const qrBaseUrl = "https://www.nhslragcalculator.com"; // Fixed external URL for the QR code
       const params = new URLSearchParams();
 
       document.querySelectorAll('input, select').forEach(input => {
@@ -350,14 +351,18 @@
         }
       });
 
-      // Construct final URL and replace it in the browser's address bar
       const queryString = params.toString();
-      const finalUrl = queryString ? `${baseUrl}?${queryString}` : baseUrl;
-      window.history.replaceState({}, '', finalUrl);
+      
+      // Update local browser's address bar without redirecting
+      const finalLocalUrl = queryString ? `${localBaseUrl}?${queryString}` : localBaseUrl;
+      window.history.replaceState({}, '', finalLocalUrl);
 
-      // 3. Generate the QR Code using the final URL
+      // Create the URL strictly for the QR code targeting nhslragcalculator.com
+      const finalQrUrl = queryString ? `${qrBaseUrl}?${queryString}` : qrBaseUrl;
+
+      // 3. Generate the QR Code using the fixed nhslragcalculator URL
       new QRCode(document.getElementById("qrcode"), {
-        text: finalUrl,
+        text: finalQrUrl,
         width: 200,
         height: 200,
         colorDark : "#222222",
