@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>RAG calculator</title>
+  <title>Basic Health Questionnaire</title>
   <style>
     body { font-family: Arial, sans-serif; background: #f3f6fb; color: #222; margin: 0; padding: 24px; }
     .container { max-width: 900px; margin: auto; background: #fff; padding: 24px; border-radius: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); position: relative; }
@@ -16,22 +16,14 @@
     input, select { width: 100%; padding: 8px; margin-top: 4px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 6px; }
     .calc-btn { margin-top: 20px; padding: 10px 14px; background: #007bff; color: #fff; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; width: 100%; }
     .calc-btn:hover { background: #0056b3; }
-    #result { margin-top: 20px; padding: 14px; border-radius: 10px; background: #f8f9fb; border: 1px solid #e0e4ea; }
-    .green { color: green; font-weight: bold; }
-    .amber { color: orange; font-weight: bold; }
-    .red { color: red; font-weight: bold; }
-    ul { margin-top: 6px; padding-left: 18px; }
-    li { margin-bottom: 4px; }
-    .info-icon { display: inline-block; width: 16px; height: 16px; line-height: 16px; border-radius: 50%; border: 1.5px solid #000; background: transparent; color: #000; text-align: center; font-size: 12px; font-weight: bold; margin-left: 6px; cursor: pointer; position: relative; }
-    .info-icon .tooltip { visibility: hidden; opacity: 0; width: max-content; max-width: 250px; background-color: #000; color: #fff; text-align: left; border-radius: 6px; padding: 6px 10px; position: absolute; z-index: 1; top: -5px; left: 105%; transition: opacity 0.3s; font-size: 12px; line-height: 1.3; white-space: pre-wrap; }
-    .info-icon:hover .tooltip { visibility: visible; opacity: 1; }
     
-    #qr-container { margin-top: 25px; padding-top: 20px; border-top: 1px solid #ccc; display: flex; flex-direction: column; align-items: center; text-align: center; }
-    #qrcode img { margin-top: 15px; border: 10px solid #fff; border-radius: 4px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
-    .qr-hint { font-size: 12px; color: #666; margin-top: 8px; max-width: 300px; }
+    #result { margin-top: 20px; }
+    #qr-container { padding: 20px; background: #f8f9fb; border-radius: 10px; border: 1px solid #e0e4ea; display: flex; flex-direction: column; align-items: center; text-align: center; }
+    #qrcode { margin-top: 15px; }
+    #qrcode img { border: 10px solid #fff; border-radius: 4px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
     
     .bmi-calc-box { background: #f8f9fb; padding: 12px; border-radius: 8px; border: 1px solid #e0e4ea; margin-bottom: 15px; margin-top: 10px; }
-    .bmi-calc-box label { font-size: 13px; font-weight: normal; margin-top: 0; color: #555; }
+    .bmi-calc-box label { font-size: 13px; font-weight: bold; margin-top: 0; color: #555; }
     .flex-row { display: flex; gap: 10px; margin-bottom: 8px; }
     .flex-row > div { flex: 1; }
   </style>
@@ -40,14 +32,14 @@
 <body>
   <div class="container">
     <button class="reset-btn" onclick="resetForm()">Reset</button>
-    <h1>RAG Calculator</h1>
+    <h1>Basic Health Questionnaire</h1>
 
     <fieldset>
       <legend>General & Logistics</legend>
 
       <!-- Height/Weight BMI Calculator -->
       <div class="bmi-calc-box">
-        <label for="unitSystem" style="font-weight: bold; color: #222; margin-bottom: 5px;">Auto-Calculate BMI (Optional)</label>
+        <label for="unitSystem" style="color: #222; margin-bottom: 5px;">Auto-Calculate BMI (Optional)</label>
         <select id="unitSystem" onchange="toggleUnits()" style="margin-bottom: 12px;">
           <option value="metric">Metric (cm & kg)</option>
           <option value="imperial">Imperial (ft/in & st/lbs)</option>
@@ -95,25 +87,19 @@
       <label for="bmi">BMI</label>
       <input type="number" id="bmi" placeholder="Enter BMI manually or use calculator above" step="0.1" min="0">
 
-      <label for="ageFlag">Age &gt;80 for knee or &gt;85 for hip</label>
-      <select id="ageFlag">
-        <option value="0">No</option>
-        <option value="1">Yes</option>
-      </select>
-
       <label for="getOut">Can you get out of the house on your own?</label>
       <select id="getOut">
         <option value="0">Yes</option>
         <option value="1">No</option>
       </select>
 
-      <label for="recentAdmit">Recent hospital admission (past 6 weeks)</label>
+      <label for="recentAdmit">Have you been admitted to hospital in the past 6 months?</label>
       <select id="recentAdmit">
         <option value="0">No</option>
         <option value="2">Yes</option>
       </select>
 
-      <label for="specialist">Are you attending or have you been referred to a Hospital specialist?</label>
+      <label for="specialist">Are you seeing, or waiting to see, a doctor or medical specialist for a health problem <u><strong>other than your bones and joints?</strong></u></label>
       <select id="specialist">
         <option value="0">No</option>
         <option value="1">Yes</option>
@@ -124,45 +110,39 @@
         <option value="0">No</option>
         <option value="1">Yes</option>
       </select>
-
-      <label for="revision">Revision surgery, complex primary or bilateral joints</label>
-      <select id="revision">
-        <option value="0">No</option>
-        <option value="1">Yes</option>
-      </select>
     </fieldset>
 
     <fieldset>
       <legend>Medical History</legend>
-      <label for="cardiac">Cardiac issues</label>
+      <label for="cardiac">Do you have any heart issues?</label>
       <select id="cardiac">
         <option value="0">None</option>
         <option value="1">Yes in the past but I have no/minimal symptoms now</option>
         <option value="3">Yes, and I have ongoing symptoms</option>
       </select>
 
-      <label for="respiratory">Respiratory issues</label>
+      <label for="respiratory">Do you have any lung issues?</label>
       <select id="respiratory">
         <option value="0">None</option>
         <option value="1">Yes in the past but I have no/minimal symptoms now</option>
         <option value="3">Yes, and I have ongoing symptoms</option>
       </select>
 
-      <label for="neurological">Neurological issues</label>
+      <label for="neurological">Do you have any brain or nervous system issues?</label>
       <select id="neurological">
         <option value="0">None</option>
         <option value="1">Yes in the past but I have no/minimal symptoms now</option>
         <option value="3">Yes, and I have ongoing symptoms</option>
       </select>
 
-      <label for="psychiatric">Psychiatric issues</label>
+      <label for="psychiatric">Do you have any mental health issues?</label>
       <select id="psychiatric">
         <option value="0">None</option>
         <option value="1">Yes in the past but I have no/minimal symptoms now</option>
         <option value="3">Yes, and I have ongoing symptoms</option>
       </select>
 
-      <label for="diabetes">Diabetes</label>
+      <label for="diabetes">Do you have Diabetes?</label>
       <select id="diabetes">
         <option value="0">None</option>
         <option value="1">Well controlled diabetes with no more than 2 medications</option>
@@ -170,14 +150,14 @@
         <option value="3">On Insulin and more than 2 other diabetic medications</option>
       </select>
 
-      <label for="anaemia">Are you known to be anaemic or have any other haematological issues?</label>
+      <label for="anaemia">Have you ever been told by a doctor that you have anaemia (a low blood count/low haemoglobin)?</label>
       <select id="anaemia">
         <option value="0">No / Don't know</option>
         <option value="1">Yes - stable and receiving treatment</option>
         <option value="3">Yes and waiting for further investigations</option>
       </select>
 
-      <label for="rrt">On renal replacement therapy</label>
+      <label for="rrt">Do you get dialysis?</label>
       <select id="rrt">
         <option value="0">No</option>
         <option value="1">Yes</option>
@@ -186,7 +166,7 @@
 
     <fieldset>
       <legend>Medications</legend>
-      <label for="numMeds">How many medications are you on (apart from pain killers)?</label>
+      <label for="numMeds">How many regular medications do you take (apart from pain killers)?</label>
       <input type="number" id="numMeds" placeholder="Enter number" min="0">
 
       <label for="antiplatelet">On Clopidogrel / Ticagrelor / Prasugrel</label>
@@ -195,26 +175,26 @@
         <option value="1">Yes</option>
       </select>
 
-      <label for="doac">On DOAC (Apixaban / Rivaroxaban / Dabigatran etc)</label>
+      <label for="doac">On blood thinner (Warfarin / Apixaban / Rivaroxaban / Dabigatran etc)</label>
       <select id="doac">
         <option value="0">No</option>
         <option value="1">Yes</option>
       </select>
 
-      <label for="glp1">On GLP1 agonist (Ozempic / Mounjaro / Wegovy / Tirzepatide / Rybelsus etc)</label>
+      <label for="glp1">On GLP1 medication (Ozempic / Mounjaro / Wegovy / Tirzepatide / Rybelsus etc)</label>
       <select id="glp1">
         <option value="0">No</option>
         <option value="1">Yes</option>
       </select>
 
-      <label for="immuno">On Immunosuppressants (apart from Prednisolone)</label>
+      <label for="immuno">On Immune system suppression (apart from Prednisolone)</label>
       <select id="immuno">
         <option value="0">No</option>
         <option value="1">Yes</option>
       </select>
     </fieldset>
 
-    <button class="calc-btn" onclick="calculateScore()">Calculate Score</button>
+    <button class="calc-btn" onclick="calculateScore()">Generate QR code</button>
     <div id="result"></div>
   </div>
 
@@ -278,7 +258,7 @@
       // Ensure the correct unit tab is visible based on URL parameters
       if (hasData) {
         toggleUnits();
-        calculateScore();
+        calculateScore(); // Automatically draw QR code if loaded with answers
       }
     });
 
@@ -291,157 +271,25 @@
       document.getElementById('unitSystem').value = 'metric';
       toggleUnits();
       
-      const baseUrl = window.location.protocol + "//" + window.location.host + window.location.pathname;
-      window.history.pushState({path: baseUrl}, '', baseUrl);
+      // Safely try to clear the URL parameters (fails silently if run from desktop file://)
+      try {
+        const baseUrl = window.location.protocol + "//" + window.location.host + window.location.pathname;
+        window.history.pushState({path: baseUrl}, '', baseUrl);
+      } catch(e) {
+        console.log("Running locally, URL not updated.");
+      }
       
       window.scrollTo({top: 0, behavior: 'smooth'});
     }
 
     function calculateScore() {
-      let score = 0;
-      let breakdown = [];
-
-      // BMI scoring
-      const bmi = parseFloat(document.getElementById('bmi').value);
-      let bmiPoints = 0;
-      if (!isNaN(bmi)) {
-        if (bmi < 18) bmiPoints = 3;
-        else if (bmi >= 18 && bmi < 20) bmiPoints = 1;
-        else if (bmi >= 20 && bmi < 35) bmiPoints = 0;
-        else if (bmi >= 35 && bmi < 40) bmiPoints = 1;
-        else if (bmi >= 40) bmiPoints = 3;
-        
-        score += bmiPoints;
-        if (bmiPoints > 0) breakdown.push(`BMI (${bmi.toFixed(1)}) = ${bmiPoints} pt${bmiPoints > 1 ? 's' : ''}`);
-      }
-
-      // Core fixed fields
-      const fields = [
-        {id:'cardiac', label:'Cardiac issues'},
-        {id:'respiratory', label:'Respiratory issues'},
-        {id:'neurological', label:'Neurological issues'},
-        {id:'psychiatric', label:'Psychiatric issues'},
-        {id:'getOut', label:'Cannot get out of house'},
-        {id:'specialist', label:'Awaiting specialist referral'},
-        {id:'ageFlag', label:'Age threshold exceeded'},
-        {id:'recentAdmit', label:'Recent hospital admission'},
-        {id:'anaemia', label:'Anaemia/Haematology'}
-      ];
-
-      fields.forEach(f => {
-        let val = parseInt(document.getElementById(f.id).value) || 0;
-        if(val > 0) {
-          score += val;
-          breakdown.push(`${f.label} = ${val} pt${val > 1 ? 's' : ''}`);
-        }
-      });
-
-      // Medications count
-      const meds = parseInt(document.getElementById('numMeds').value) || 0;
-      if (meds >= 5) {
-        score += 1;
-        breakdown.push(`Non-analgesic medications (${meds}) = 1 pt`);
-      }
-
-      // Diabetes
-      const diabetesPts = parseInt(document.getElementById('diabetes').value) || 0;
-      if (diabetesPts > 0) {
-        score += diabetesPts;
-        const diabetesLabel = document.getElementById('diabetes').options[document.getElementById('diabetes').selectedIndex].text;
-        breakdown.push(`Diabetes: ${diabetesLabel} = ${diabetesPts} pt${diabetesPts > 1 ? 's' : ''}`);
-      }
-
-      // Immunosuppressants
-      const immuno = parseInt(document.getElementById('immuno').value) || 0;
-      if (immuno > 0) {
-        score += 3;
-        breakdown.push('On Immunosuppressants = 3 pts');
-      }
-
-      // Variable points function
-      function getTopUpPoints(currentScore) {
-        if(currentScore === 0) return 3;
-        if(currentScore === 1) return 2;
-        if(currentScore === 2) return 1;
-        return 0;
-      }
-      
-      const revision = parseInt(document.getElementById('revision').value) || 0;
-      const antiplatelet = parseInt(document.getElementById('antiplatelet').value) || 0;
-      const doac = parseInt(document.getElementById('doac').value) || 0;
-
-      if (revision > 0) {
-        let pts = getTopUpPoints(score);
-        score += pts;
-        if(pts > 0) breakdown.push(`Surgical Complexity = ${pts} pt${pts !== 1 ? 's' : ''}`);
-      }
-      if (antiplatelet > 0) {
-        let pts = getTopUpPoints(score);
-        score += pts;
-        if(pts > 0) breakdown.push(`On Antiplatelet = ${pts} pt${pts !== 1 ? 's' : ''}`);
-      }
-      if (doac > 0) {
-        let pts = getTopUpPoints(score);
-        score += pts;
-        if(pts > 0) breakdown.push(`On DOAC = ${pts} pt${pts !== 1 ? 's' : ''}`);
-      }
-
-      let risk = '', riskClass = '';
-      if (score >= 6) { risk = 'Red'; riskClass = 'red'; }
-      else if (score >= 3) { risk = 'Amber'; riskClass = 'amber'; }
-      else { risk = 'Green'; riskClass = 'green'; }
-
-      const autoNoFields = ['rrt','antiplatelet','doac','glp1','immuno','notice'];
-      let autoNo = autoNoFields.some(id => parseInt(document.getElementById(id).value) > 0);
-      
-      if (parseInt(document.getElementById('revision').value) > 0 || parseInt(document.getElementById('anaemia').value) === 3) {
-        autoNo = true;
-      }
-
-      let suitable = "Yes", suitableClass = "green";
-      if (score > 8 || autoNo) { suitable = "No"; suitableClass = "red"; }
-
-      let fourJoint = "Yes", fourJointClass = "green", fourJointReason = "";
-      let reasons = [];
-      if (risk !== 'Green') reasons.push(`RAG pathway is ${risk}`);
-      if (!isNaN(bmi) && bmi >= 35) reasons.push(`BMI is ${bmi.toFixed(1)} (≥ 35)`);
-      
-      if (reasons.length > 0) { 
-        fourJoint = "No"; 
-        fourJointClass = "red"; 
-        fourJointReason = reasons.join(" and "); 
-      }
-
-      // Render the Results
-      document.getElementById('result').innerHTML = `
-        <strong>Total Score: ${score}</strong><br>
-        <span class="${riskClass}"><strong>RAG Category: ${risk}</strong></span><br>
-        <br>
-        <strong>Suitable to come in on same day?:</strong>
-        <span class="${suitableClass}">${suitable}</span><br>
-        <strong>Suitable for 4 joint list?:</strong>
-        <span class="${fourJointClass}">
-          ${fourJoint}
-          ${fourJointReason ? `<span class="info-icon">i<span class="tooltip">${fourJointReason}</span></span>` : ''}
-        </span>
-        <div style="margin-top:15px;">
-          <strong>Breakdown:</strong>
-          <ul>${breakdown.map(x => `<li>${x}</li>`).join('')}</ul>
-        </div>
-        
-        <div id="qr-container">
-          <strong>Scan to reopen this assessment:</strong>
-          <div id="qrcode"></div>
-          <div class="qr-hint">This QR code contains a link back to this tool with all your selected flags pre-filled.</div>
-        </div>
-      `;
-
-      // Build the URL params for sharing/saving
+      // 1. Build the URL params
       const localBaseUrl = window.location.protocol + "//" + window.location.host + window.location.pathname;
       const qrBaseUrl = "https://www.nhslragcalculator.com"; 
       const params = new URLSearchParams();
 
       document.querySelectorAll('input, select').forEach(input => {
+        // Only include non-empty, non-baseline values to keep QR code less dense
         if (input.tagName === 'SELECT' && input.selectedIndex > 0) {
           params.set(input.id, input.value);
         } else if (input.tagName === 'INPUT' && input.value.trim() !== '') {
@@ -451,22 +299,39 @@
 
       const queryString = params.toString();
       
-      // Update local browser's address bar without redirecting
-      const finalLocalUrl = queryString ? `${localBaseUrl}?${queryString}` : localBaseUrl;
-      window.history.replaceState({}, '', finalLocalUrl);
+      // 2. Safely try to update local browser's address bar without redirecting
+      try {
+        const finalLocalUrl = queryString ? `${localBaseUrl}?${queryString}` : localBaseUrl;
+        window.history.replaceState({}, '', finalLocalUrl);
+      } catch (e) {
+        // Prevent script from crashing if user is testing locally via file:///
+        console.log("Running locally, URL not updated.");
+      }
 
       // Create the URL specifically for the QR code targeting nhslragcalculator.com
       const finalQrUrl = queryString ? `${qrBaseUrl}?${queryString}` : qrBaseUrl;
 
-      // Generate the QR Code using the fixed nhslragcalculator URL
-      new QRCode(document.getElementById("qrcode"), {
-        text: finalQrUrl,
-        width: 200,
-        height: 200,
-        colorDark : "#222222",
-        colorLight : "#ffffff",
-        correctLevel : QRCode.CorrectLevel.M 
-      });
+      // 3. Render the QR code container to the page
+      document.getElementById('result').innerHTML = `
+        <div id="qr-container">
+          <strong>Please take a picture of this QR code and bring it to clinic:</strong>
+          <div id="qrcode"></div>
+        </div>
+      `;
+
+      // 4. Generate the QR Code using the fixed nhslragcalculator URL
+      // We wrap this in a slight timeout to ensure the browser has finished drawing the empty div above
+      setTimeout(() => {
+        document.getElementById("qrcode").innerHTML = ""; // Clean before drawing
+        new QRCode(document.getElementById("qrcode"), {
+          text: finalQrUrl,
+          width: 200,
+          height: 200,
+          colorDark : "#222222",
+          colorLight : "#ffffff",
+          correctLevel : QRCode.CorrectLevel.M 
+        });
+      }, 50);
     }
   </script>
 </body>
